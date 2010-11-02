@@ -1,0 +1,29 @@
+h1. mysqlcdr - MySQL CallDetailRecords  
+
+_mysqlcdr_ is a simple Script to browse CallDetailRecords
+
+Copyright (C) 2010  Patrick C. Engel <engel@cpbx.eu>, 
+License GNU GPL v3 (or any later)
+
+************************************************************************
+
+h2. INSTALLATION
+
+* move the src folder to the cgi-bin directory of your Webserver, 
+  eg. /usr/lib/cgi-bin/ 
+* point your Browser to http://WEB_SERVER/cgi-bin/cdr.py
+* edit the Configution, file: `cdr_mysql.cfg'
+
+<pre>
+[general]
+lang=de
+
+[mysql]
+host=localhost
+user=root
+passwd=myPassword
+db=cpbx
+
+</pre>
+
+Make sure Python 2.5+ and MySQLdb (python-mysqldb) is installed.
