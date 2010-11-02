@@ -19,10 +19,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
- @package 		mysqlcdr
- @brief 		mysqlcdr is a simple Script to browse Calldetails
- @author 		Patrick C. Engel <engel@cpbx.eu>
- @copyright 	2010 Patrick C. Engel <engel@cpbx.eu>
+ @package		mysqlcdr
+ @brief			mysqlcdr is a simple Script to browse Calldetails
+ @author		Patrick C. Engel <engel@cpbx.eu>
+ @copyright		2010 Patrick C. Engel <engel@cpbx.eu>
  @license		GNU GPL v3.
     
 """
@@ -73,7 +73,9 @@ t9n = {'de':{'Number':'Nummer',
   'dcontext': 	'Kontext',
   'channel': 	'Channel',
   'billsec':	'Sek.',
-  'accountcode':'Nebenstelle'}
+  'accountcode':'Nebenstelle',
+  'Next': 'Vorw&auml;rts',
+  'Previous': 'Zur&uuml;ck'}
 }
 
 
@@ -291,19 +293,16 @@ cdr_searchform_html()
 # **********************************************
 
 def cdr_paginate_html(page, offset, rowcount):
-	# print "<form method=get><input name=prev value=&gt; ><input name=next value=&lt;></from>"
-	# +'?num=%s&amp;type=%s&amp;
-  	# href = 'href="'+os.path.basename(sys.argv[0])+'?p=%d&amp;o=%s&amp;os=%d&amp;rc=%d"' % (page, order, offset, rowcount)
 	print "<div id=paginate>"
 	if(int(page)>=1):
           p = int(page)-1	  
           ofs = int(p) * int(rowcount)
   	  href = 'href="'+os.path.basename(sys.argv[0])+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
-  	  print "<a ",href,">","  Zur&uuml;ck </a>"
+  	  print "<a ", href, "> " + t('Previous') + " </a>"
 	p = int(page)+1
         ofs = int(p) * int(rowcount)
   	href = 'href="'+os.path.basename(sys.argv[0])+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
-  	print "<a ",href,">"," Vorw&auml;rts </a>"
+  	print "<a ",href,"> " + t('Next') + " </a>"
 	print "</div>"
 	return
 
