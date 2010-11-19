@@ -82,14 +82,6 @@ t9n = {'de':{'Number':'Nummer',
 def t(msgid):
   return t9n[lang][msgid]
 
-def beautify(str):
-  str = str.replace('ü', '&uuml;')
-  str = str.replace('Ü', '&Uuml;')
-  str = str.replace('Ä', '&Auml;')
-  str = str.replace('ä', '&auml;')
-  str = str.replace('Ö', '&Ouml;')
-  str = str.replace('ö', '&ouml;')
-  return str
 
 def find_protocol(str):
   if (str.find('mISDN') != -1): return 'mISDN'
@@ -193,7 +185,7 @@ class Cdr:
 	html = ""
 	def header_html(self, theme_light):
   		print """Content-type: text/html\n
-<!DOCTYPE html><html><head><style>%s</style><title>CPBX.Calldetails</title>
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>%s</style><title>CPBX.Calldetails</title>
 </head><body><div id=body><div id=header><h1>CPBX Calldetails</h1></div>\n""" %   theme_light
 
 	def footer_html(self):
@@ -264,11 +256,11 @@ class Cdr:
 				print "<img src=http://cpbx.eu/images/cdr/telephone.png title=busy>"
 			else:
 				print "<img src=http://cpbx.eu/images/cdr/telephone_noanswer.png title=noanswer>"
-			print "</td><td>",calldate,"</td><td>", beautify(clid),"</td><td>",src,"</td><td>",dst,"</td>"
-			print "<td>",dcontext,"</td>"
-			print "<td class=",find_protocol(channel),">",channel,"</td>"
+			print "</td><td>",calldate,"</td><td>", cgi.escape(clid),"</td><td>",cgi.escape(src),"</td><td>",cgi.escape(dst),"</td>"
+			print "<td>",cgi.escape(dcontext),"</td>"
+			print "<td class=",find_protocol(channel),">",cgi.escape(channel),"</td>"
 			print "<td>",billsec,"</td>"
-			print "<td><b>",accountcode,"</b></td>"
+			print "<td><b>",cgi.escape(accountcode),"</b></td>"
 			print "</tr>"
 			  
 		print "</tbody></table></div>"
