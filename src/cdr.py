@@ -99,9 +99,11 @@ class Cdr:
 			style = open(get_default_confval('general', 'theme', 'theme_light.css'), 'r').read() 
 		except (IOError), e:
 			style = "/* default theme `theme_light.css' not found */"
-  		print """Content-type: text/html\n
-<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>%s</style><title>CPBX.Calldetails</title>
-</head><body><div id=body><div id=header><h1>CPBX Calldetails</h1></div>\n""" %   style
+		vars = {"style": style, "title": "CPBX Calldetails"}
+  		print "Content-type: text/html"
+  		print
+		print "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+		print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1>%(title)s</h1></div>\n" % vars
 
 	def footer_html(self):
 		dt = datetime.now()
@@ -179,6 +181,9 @@ class Cdr:
 			print "</tr>"
 			  
 		print "</tbody></table></div>"
+
+#	def evaluate_params(self):
+		
 
 
 # ********************** cgi.main **********************
