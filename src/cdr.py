@@ -90,103 +90,18 @@ def find_protocol(str):
   return 'default'
 
 
-# ********************** header **********************
-
-theme_light = """body {
-    font-family: sans-serif;
-    font-size: 100%;
-    background-color:#eee;
-    color:#00303d;
-    margin: 0;
-    padding: 0;
-  }
-
-  table {
-    background-color:#fff;
-    color:#333;
-    border:4px solid #fff;
-  }
-  
-  td {
-    background-color:#E0E1E4;
-    padding: 3px;
-    color:#001;
-  }
-  
-  thead td {
-    background-color:#fff;
-  }
-  tr:hover td,tr:hover th{background:#ddf;}
-  #body {
-    padding: 0 20px 30px 20px;
-  }
-  
-  #results {
-    width:100%;
-    background-color:#fff;
-    border-top:10px solid #cdc;
-    overflow:auto;
-  }
- #paginate {
-    background-color:#bcb;
-    height:1.5em;
- }
-
- #paginate a {
-    color:#fff;
-    font-size: 90%;
-    font-family: monospace;
-    background-color:#466;
-    /* width:2.4em; */
-    margin-left:4px;
-    border:2px solid #466;
-    text-decoration:none;
-    /* css3 */
-    border-radius:8px;
-    -moz-border-radius:8px;
-    -webkit-border-radius:8px;
-    -khtml-border-radius:8px;
- }
-
- #paginate a:hover {
-    background-color:#363;
-    border:2px solid #363;
- }
-
- #searchform {
-    background-color:#bbb;
-    color:#1c4e63;
-    padding: 10px 20px 30px 20px;
-    /* css3 */
-    border-top-right-radius:8px;
-    border-top-left-radius:8px;
-    -moz-border-radius-topleft:8px;
-    -webkit-border-top-left-radius:8px;
-    -khtml-border-top-left-radius:8px;
-    -moz-border-radius-topright:8px;
-    -webkit-border-top-right-radius:8px;
-    -khtml-border-top-right-radius:8px;
-  }
-
-  #footer {
-    padding: 4px;
-    font-size:0.7em;
-    color:#bbb;
-  }
-  .mISDN { background-color:#eef;}
-  .SIP { background-color:#efe;}
-  .IAX2 { background-color:#fee;}
-  /* #E0E1E4;*/"""
-
-	 
 # **********************************************************************
 
 class Cdr:
 	html = ""
-	def header_html(self, theme_light):
+	def header_html(self):
+		try:
+			style = open(get_default_confval('general', 'theme', 'theme_light.css'), 'r').read() 
+		except (IOError), e:
+			style = "/* default theme `theme_light.css' not found */"
   		print """Content-type: text/html\n
 <!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>%s</style><title>CPBX.Calldetails</title>
-</head><body><div id=body><div id=header><h1>CPBX Calldetails</h1></div>\n""" %   theme_light
+</head><body><div id=body><div id=header><h1>CPBX Calldetails</h1></div>\n""" %   style
 
 	def footer_html(self):
 		dt = datetime.now()
@@ -292,7 +207,7 @@ else:
 
 cdr = Cdr()
 
-cdr.header_html(theme_light)
+cdr.header_html()
 cdr.searchform_html()
 
 # connect to MySQL Database
