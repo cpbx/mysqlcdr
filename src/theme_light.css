@@ -82,8 +82,7 @@ tr:hover td,tr:hover th{background:#ddf;}
 	color:#bbb;
 }
 
-.mISDN { background-color:#eef;}
-.SIP { background-color:#efe;}
-.IAX2 { background-color:#fee;}
-/* #E0E1E4;*/
-  
+.mISDN { color:#640;}
+.SIP { color:#049;}
+.IAX2 { color:#062;}
+ 
