@@ -80,7 +80,11 @@ t9n = {'de':{'Number':'Nummer',
 
 
 def t(msgid):
-  return t9n[lang][msgid]
+	try:
+		msg = t9n[lang][msgid]
+	except KeyError:
+		msg = msgid
+	return msg	
 
 
 def find_protocol(str):
