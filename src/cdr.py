@@ -202,7 +202,7 @@ class Cdr:
 	def billsum_html(self, seconds):
 		print "<div id=results><table>"
 		print "<thead><tr><td><b>" + cgi.escape(self.account)+"</b></td><td>"+t('seconds')+"</td><td>"+t('minutes')+"</td></thead><tbody>"
-		# ... 
+		# TODO incoming, sum of both. form: month(+/-), year
 		print "<tr>"
 		print "<td>"+ t('outgoing') +"</td>"
 		print "<td>",seconds,"</td>"
@@ -213,7 +213,6 @@ class Cdr:
 
 
 	def db_connect(self):
-		# connect to MySQL Database
 		try:
 			dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
 								user=config.get("mysql", "user"),
@@ -224,9 +223,7 @@ class Cdr:
 			print "Error %d: %s" % (e.args[0], e.args[1])
 			sys.exit (1)
 		return dbh
-		
-		
-	
+
 	def action_list(self):
 		self.header_html()
 		self.searchform_html()
@@ -238,17 +235,19 @@ class Cdr:
 
 		# search query
 		if form.has_key('num') and not (form["num"].value==""):
-			query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" % (dbh.escape_string(form["type"].value), 
-																							dbh.escape_string(form["num"].value), 
-																							dbh.escape_string(self.order), 
-																							dbh.escape_string(self.offset), 
-																							dbh.escape_string(self.rowcount))
+			query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" \
+							% (dbh.escape_string(form["type"].value), 
+								dbh.escape_string(form["num"].value), 
+								dbh.escape_string(self.order), 
+								dbh.escape_string(self.offset), 
+								dbh.escape_string(self.rowcount))
 			cursor.execute(query)
 		else:
 			# defaultquery
-			query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(self.order), 
-																			  dbh.escape_string(self.offset), 
-																			  dbh.escape_string(self.rowcount))
+			query = """select * from cdr order by calldate %s limit %s,%s""" \
+							% (dbh.escape_string(self.order), 
+								  dbh.escape_string(self.offset), 
+								  dbh.escape_string(self.rowcount))
 			cursor.execute(query)
 
 		query_result = cursor.fetchall()
@@ -273,13 +272,15 @@ class Cdr:
 			else:
 				dt = datetime.now()
 				year = str(dt.year)
-			query = """select sum(billsec) as bsum from cdr where month(calldate)=%s and year(calldate)=%s and accountcode=%s""" % (dbh.escape_string(form["m"].value),
-																							dbh.escape_string(year),
-																							dbh.escape_string(self.account))
+			query = """select sum(billsec) as bsum from cdr where month(calldate)=%s and year(calldate)=%s and accountcode=%s""" \
+							% (dbh.escape_string(form["m"].value),
+								dbh.escape_string(year),
+								dbh.escape_string(self.account))
 			cursor.execute(query)
 		else:
 			# defaultquery
-			query = """select sum(billsec) as bsum from cdr where accountcode=%s""" % (dbh.escape_string(self.account))
+			query = """select sum(billsec) as bsum from cdr where accountcode=%s""" \
+							% (dbh.escape_string(self.account))
 			cursor.execute(query)
 
 		query_result = cursor.fetchone()
@@ -288,7 +289,8 @@ class Cdr:
 		cdr.footer_html()
 	
 	def evaluate_params(self):
-		""" o: self.order, os: self.offset, rc: self.rowcount, p: self.page, a: self.action """
+		""" o: self.order, os: self.offset, rc: self.rowcount, p: self.page, 
+		acc: self.account, a: self.action """
 		# order
 		if form.has_key('o'):
   			self.order = form["o"].value
@@ -334,7 +336,6 @@ class Cdr:
 		self.evaluate_params()
 		# os.path.basename(sys.argv[0])
 		self.scriptname = os.environ.get('SCRIPT_NAME', '')
-
 
 		
 # **********************************************************************
