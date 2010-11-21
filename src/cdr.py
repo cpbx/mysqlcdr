@@ -19,11 +19,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
- @package		mysqlcdr
- @brief			mysqlcdr is a simple Script to browse Calldetails
- @author		Patrick C. Engel <engel@cpbx.eu>
- @copyright		2010 Patrick C. Engel <engel@cpbx.eu>
- @license		GNU GPL v3.
+ @package       mysqlcdr
+ @brief         mysqlcdr is a simple Script to browse Calldetails
+ @author        Patrick C. Engel <engel@cpbx.eu>
+ @copyright     2010 Patrick C. Engel <engel@cpbx.eu>
+ @license       GNU GPL v3.
     
 """
 
@@ -50,11 +50,11 @@ config = ConfigParser.ConfigParser()
 config.read('cdr_mysql.cfg')
 
 def get_default_confval(section, key, default):
-  try:
-    ret = config.get(section, key)
-  except (ConfigParser.NoSectionError,ConfigParser.NoOptionError), e:
-    ret = default
-  return ret
+	try:
+		ret = config.get(section, key)
+	except (ConfigParser.NoSectionError,ConfigParser.NoOptionError), e:
+		ret = default
+	return ret
 
 
 # ********************** i18n **********************
@@ -193,14 +193,14 @@ class Cdr:
 
 		# connect to MySQL Database
 		try:
-		  dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
+			dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
 								user=config.get("mysql", "user"),
 								passwd=config.get("mysql", "passwd"),
 								db=config.get("mysql", "db"))
 
 		except MySQLdb.Error, e:
-		  print "Error %d: %s" % (e.args[0], e.args[1])
-		  sys.exit (1)
+			print "Error %d: %s" % (e.args[0], e.args[1])
+			sys.exit (1)
 
 		cursor = dbh.cursor()
 
@@ -210,18 +210,18 @@ class Cdr:
 
 		# search query
 		if form.has_key('num') and not (form["num"].value==""):
-		  query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" % (dbh.escape_string(form["type"].value), 
+			query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" % (dbh.escape_string(form["type"].value), 
 																							dbh.escape_string(form["num"].value), 
 																							dbh.escape_string(self.order), 
 																							dbh.escape_string(self.offset), 
 																							dbh.escape_string(self.rowcount))
-		  cursor.execute(query)
+			cursor.execute(query)
 		else:
 		  # defaultquery
-		  query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(self.order), 
+			query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(self.order), 
 																			  dbh.escape_string(self.offset), 
 																			  dbh.escape_string(self.rowcount))
-		  cursor.execute(query)
+			cursor.execute(query)
 
 		query_result = cursor.fetchall()
 		cursor.close()
@@ -235,17 +235,17 @@ class Cdr:
 		if form.has_key('o'):
   			self.order=form["o"].value
 		else:
-		  self.order="desc"
+			self.order="desc"
 		# offset
 		if form.has_key('os'):
-		  self.offset=form["os"].value
+			self.offset=form["os"].value
 		else:
-		  self.offset="0"
+			self.offset="0"
 		# items per page
 		if form.has_key('rc'):
-		  self.rowcount=form["rc"].value
+			self.rowcount=form["rc"].value
 		else:
-		  self.rowcount="50"
+			self.rowcount="50"
 		# page	  
 		if form.has_key('p'): 
 			self.page = form["p"].value
