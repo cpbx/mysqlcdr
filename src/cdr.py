@@ -122,7 +122,7 @@ class Cdr:
 		print "</div>\n</div></body>"
 
 	def searchform_html(self):
-		formaction = 'action="'+os.path.basename(sys.argv[0])+'"'
+		formaction = 'action="'+self.scriptname+'"'
 		print "<div id=searchform><form method=get ",formaction,">"
 		print "<label>"+t('Number')+":</label>&nbsp;"
 		if form.has_key('num'):
@@ -162,11 +162,11 @@ class Cdr:
 		if(int(page)>=1):
 			p = int(page)-1	  
 			ofs = int(p) * int(rowcount)
-			href = 'href="'+os.path.basename(sys.argv[0])+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
+			href = 'href="'+self.scriptname+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
 			print "<a ", href, "> " + t('Previous') + " </a>"
 		p = int(page)+1
 		ofs = int(p) * int(rowcount)
-		href = 'href="'+os.path.basename(sys.argv[0])+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
+		href = 'href="'+self.scriptname+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
 		print "<a ",href,"> " + t('Next') + " </a>"
 		print "</div>"
 		return
