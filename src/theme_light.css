@@ -1,10 +1,45 @@
+/**
+ * @style     mysqlcdr
+ * @media     screen
+ * @author    pce
+ * @copyright 2010 Patrick Engel
+ * 
+ */
+
+
+/**
+ * global reset
+ * 
+ * @section reset
+ */
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/**
+ * basic formatting
+ * 
+ * @section basic
+ */
 body {
     font-family: sans-serif;
     font-size: 100%;
     background-color:#eee;
     color:#00303d;
-    margin: 0;
-    padding: 0;
+}
+
+h1 {
+	padding: 0.5em;
+}
+
+h1 a {
+    color:#444;
+    text-decoration:none;
+}
+
+h1 a:hover {
+    color:#007;
 }
 
 table {
@@ -22,8 +57,31 @@ td {
 thead td {
     background-color:#fff;
 }
-tr:hover td,tr:hover th{background:#ddf;}
 
+tr:hover td,tr:hover th {
+	background:#ddf;
+}
+
+a.account {
+	color:#00303d;
+	text-decoration:none;
+}
+
+a.account:hover {
+	color:#039;
+	text-decoration:underline;
+}
+
+.mISDN { color:#640;}
+.SIP { color:#049;}
+.IAX2 { color:#062;}
+
+
+/**
+ * layout
+ * 
+ * @section layout
+ */
 #body {
     padding: 0 20px 30px 20px;
 }
@@ -35,6 +93,17 @@ tr:hover td,tr:hover th{background:#ddf;}
     overflow:auto;
 }
 
+#footer {
+	padding: 4px;
+	font-size:0.7em;
+	color:#bbb;
+}
+
+/**
+ * pagination, searchform
+ * 
+ * @section elements
+ */
 #paginate {
     background-color:#bcb;
     height:1.5em;
@@ -75,14 +144,3 @@ tr:hover td,tr:hover th{background:#ddf;}
 	-webkit-border-top-right-radius:8px;
 	-khtml-border-top-right-radius:8px;
 }
-
-#footer {
-	padding: 4px;
-	font-size:0.7em;
-	color:#bbb;
-}
-
-.mISDN { color:#640;}
-.SIP { color:#049;}
-.IAX2 { color:#062;}
- 

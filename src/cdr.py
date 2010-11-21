@@ -40,11 +40,11 @@ from datetime import datetime, date, time
 # show errors in browser
 import cgitb
 cgitb.enable()
-sys.stderr=sys.stdout
+sys.stderr = sys.stdout
 
 # ********************** config **********************
 
-__revision__ = (1,0)
+__revision__ = (1,1)
 
 config = ConfigParser.ConfigParser()
 config.read('cdr_mysql.cfg')
@@ -59,51 +59,61 @@ def get_default_confval(section, key, default):
 
 # ********************** i18n **********************
 
-lang= get_default_confval('general', 'lang', 'de')
+lang = get_default_confval('general', 'lang', 'de')
 
 t9n = {'de':{'Number':'Nummer',
-  'Order':	'Sortierung',
-  'offset':	'Start',
-  'row count':	'Anzahl',
-  'status':	'Status',
-  'calldate':	'Datum', 
-  'clid':	'Anruferinfo',
-  'src': 	'A-Nummer', 
-  'dst': 	'B-Nummer',
-  'dcontext': 	'Kontext',
-  'channel': 	'Channel',
-  'billsec':	'Sek.',
-  'accountcode':'Nebenstelle',
-  'Next': 'Vorw&auml;rts',
-  'Previous': 'Zur&uuml;ck'}
+	'Order': 'Sortierung',
+	'offset': 'Start',
+	'row count': 'Anzahl',
+	'status': 'Status',
+	'calldate': 'Datum', 
+	'clid': 'Anruferinfo',
+	'src': 'A-Nummer', 
+	'dst': 'B-Nummer',
+	'dcontext': 'Kontext',
+	'channel': 'Channel',
+	'billsec': 'Sek.',
+	'accountcode': 'Nebenstelle',
+	'Next': 'Vorw&auml;rts',
+	'Previous': 'Zur&uuml;ck',
+	'minutes': 'Minuten',
+	'sum': 'Summe'}
 }
 
 
 def t(msgid):
-  return t9n[lang][msgid]
+	try:
+		msg = t9n[lang][msgid]
+	except KeyError:
+		msg = msgid
+	return msg
 
 
 def find_protocol(str):
-  if (str.find('mISDN') != -1): return 'mISDN'
-  if (str.find('SIP') != -1): return 'SIP'
-  if (str.find('IAX2') != -1): return 'IAX2'
-  return 'default'
+	if (str.find('mISDN') != -1):
+		return 'mISDN'
+	if (str.find('SIP') != -1):
+		return 'SIP'
+	if (str.find('IAX2') != -1):
+		return 'IAX2'
+	return 'default'
 
 
 # **********************************************************************
 
 class Cdr:
 	html = ""
+	scriptname = ""
 	def header_html(self):
 		try:
 			style = open(get_default_confval('general', 'theme', 'theme_light.css'), 'r').read() 
 		except (IOError), e:
 			style = "/* default theme `theme_light.css' not found */"
-		vars = {"style": style, "title": "CPBX Calldetails"}
+		vars = {"style": style, "title": "CPBX Calldetails", "scriptname": self.scriptname}
   		print "Content-type: text/html"
   		print
 		print "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-		print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1>%(title)s</h1></div>\n" % vars
+		print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1><a href=\"%(scriptname)s?a=list\">%(title)s</a></h1></div>\n" % vars
 
 	def footer_html(self):
 		dt = datetime.now()
@@ -161,8 +171,10 @@ class Cdr:
 		print "</div>"
 		return
 
-		
-	def results_html(self, query_result):
+	def list_html(self, query_result):
+		dt = datetime.now()
+		year = str(dt.year)
+		month = str(dt.month)
 		print "<div id=results><table>"
 		print "<thead><tr><td>"+t('status')+"</td><td>"+t('calldate')+"</td><td>"+t('clid')+"</td><td>"+t('src')+"</td><td>"
 		print t('dst')+"</td><td>"+t('dcontext')+"</td><td>"+t('channel')+"</td><td>"+t('billsec')+"</td><td>"+t('accountcode')+"</td></thead><tbody>"
@@ -181,16 +193,26 @@ class Cdr:
 			print "<td>",cgi.escape(dcontext),"</td>"
 			print "<td class=",find_protocol(channel),">",cgi.escape(channel),"</td>"
 			print "<td>",billsec,"</td>"
-			print "<td><b>",cgi.escape(accountcode),"</b></td>"
+			href = 'href="'+self.scriptname+'?a=billsum&amp;acc=%s&amp;m=%s&amp;y=%s"' % (accountcode, month, year)
+			print "<td><a class=account ",href,">",cgi.escape(accountcode),"</a></td>"
 			print "</tr>"
 			  
 		print "</tbody></table></div>"
 
-	
-	def action_list(self):
-		self.header_html()
-		self.searchform_html()
+	def billsum_html(self, seconds):
+		print "<div id=results><table>"
+		print "<thead><tr><td><b>" + cgi.escape(self.account)+"</b></td><td>"+t('seconds')+"</td><td>"+t('minutes')+"</td></thead><tbody>"
+		# ... 
+		print "<tr>"
+		print "<td>"+ t('outgoing') +"</td>"
+		print "<td>",seconds,"</td>"
+		minutes = int(seconds) / 60;
+		print "<td>",str(minutes),"</td>"
+		print "</tr>"
+		print "</tbody></table></div>"
 
+
+	def db_connect(self):
 		# connect to MySQL Database
 		try:
 			dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
@@ -201,10 +223,16 @@ class Cdr:
 		except MySQLdb.Error, e:
 			print "Error %d: %s" % (e.args[0], e.args[1])
 			sys.exit (1)
+		return dbh
+		
+		
+	
+	def action_list(self):
+		self.header_html()
+		self.searchform_html()
 
+		dbh = self.db_connect()
 		cursor = dbh.cursor()
-
-		# "dispatch" and parameterize query
 
 		self.paginate_html()
 
@@ -217,7 +245,7 @@ class Cdr:
 																							dbh.escape_string(self.rowcount))
 			cursor.execute(query)
 		else:
-		  # defaultquery
+			# defaultquery
 			query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(self.order), 
 																			  dbh.escape_string(self.offset), 
 																			  dbh.escape_string(self.rowcount))
@@ -225,47 +253,88 @@ class Cdr:
 
 		query_result = cursor.fetchall()
 		cursor.close()
-		cdr.results_html(query_result)
+		cdr.list_html(query_result)
 		cdr.footer_html()
 
 	
+	def action_billsum(self):
+		self.header_html()
+		self.searchform_html()
+		dbh = self.db_connect()
+		cursor = dbh.cursor()
+
+		self.paginate_html()
+
+		# search query
+		
+		if form.has_key('m') and not (form["m"].value==""):
+			if form.has_key('y'):
+				year = form["y"].value
+			else:
+				dt = datetime.now()
+				year = str(dt.year)
+			query = """select sum(billsec) as bsum from cdr where month(calldate)=%s and year(calldate)=%s and accountcode=%s""" % (dbh.escape_string(form["m"].value),
+																							dbh.escape_string(year),
+																							dbh.escape_string(self.account))
+			cursor.execute(query)
+		else:
+			# defaultquery
+			query = """select sum(billsec) as bsum from cdr where accountcode=%s""" % (dbh.escape_string(self.account))
+			cursor.execute(query)
+
+		query_result = cursor.fetchone()
+		cursor.close()
+		cdr.billsum_html(query_result[0])
+		cdr.footer_html()
+	
 	def evaluate_params(self):
-		""" self.order, self.offset, self.rowcount, self.page """
+		""" o: self.order, os: self.offset, rc: self.rowcount, p: self.page, a: self.action """
 		# order
 		if form.has_key('o'):
-  			self.order=form["o"].value
+  			self.order = form["o"].value
 		else:
 			self.order="desc"
 		# offset
 		if form.has_key('os'):
-			self.offset=form["os"].value
+			self.offset = form["os"].value
 		else:
-			self.offset="0"
+			self.offset = "0"
 		# items per page
 		if form.has_key('rc'):
-			self.rowcount=form["rc"].value
+			self.rowcount = form["rc"].value
 		else:
-			self.rowcount="50"
+			self.rowcount = "50"
 		# page	  
-		if form.has_key('p'): 
+		if form.has_key('p'):
 			self.page = form["p"].value
 		else: 
 			self.page = 0
-		# action
-		if form.has_key('a'): 
-			self.action = "action_" + form["a"].value
+		# account
+		if form.has_key('acc'):
+			self.account = form["acc"].value
 		else: 
+			self.account = "0"
+
+		# action
+		if form.has_key('a'):
+			self.action = "action_" + form["a"].value
+		else:
 			self.action = "action_list"
 
 	def dispatch(self):
 		if hasattr(self, self.action):
 			_action = getattr(self, self.action)()
+		else:
+			raise ValueError("Unknown Action (a).")
 
 	def run(self):
 		self.dispatch()
 
 	def __init__(self):
 		self.evaluate_params()
+		# os.path.basename(sys.argv[0])
+		self.scriptname = os.environ.get('SCRIPT_NAME', '')
+
 
 		
 # **********************************************************************
