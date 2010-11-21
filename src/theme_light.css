@@ -73,9 +73,9 @@ a.account:hover {
 	text-decoration:underline;
 }
 
-.mISDN { color:#640;}
-.SIP { color:#049;}
-.IAX2 { color:#062;}
+.mISDN { color:#640;font-weight:bold;}
+.SIP { color:#049; font-weight:bold;}
+.IAX2 { color:#051; font-weight:bold;}
 
 
 /**
