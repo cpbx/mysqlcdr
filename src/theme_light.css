@@ -65,6 +65,7 @@ tr:hover td,tr:hover th {
 a.account {
 	color:#00303d;
 	text-decoration:none;
+	font-weight:bold;
 }
 
 a.account:hover {
