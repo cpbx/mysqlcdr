@@ -86,11 +86,7 @@ def t(msgid):
 		msg = t9n[lang][msgid]
 	except KeyError:
 		msg = msgid
-<<<<<<< HEAD:src/cdr.py
 	return msg	
-=======
-	return msg
->>>>>>> cleancode:src/cdr.py
 
 
 def find_protocol(str):
