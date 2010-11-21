@@ -143,7 +143,11 @@ class Cdr:
 		print "<input type=submit value=show></form></div>"
 
 
-	def paginate_html(self, page, offset, rowcount):
+	def paginate_html(self):
+		page = self.page
+		offset = self.offset
+		rowcount = self.rowcount
+		order = self.order
 		print "<div id=paginate>"
 		if(int(page)>=1):
 			p = int(page)-1	  
@@ -182,75 +186,91 @@ class Cdr:
 			  
 		print "</tbody></table></div>"
 
-#	def evaluate_params(self):
+	
+	def action_list(self):
+		self.header_html()
+		self.searchform_html()
+
+		# connect to MySQL Database
+		try:
+		  dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
+								user=config.get("mysql", "user"),
+								passwd=config.get("mysql", "passwd"),
+								db=config.get("mysql", "db"))
+
+		except MySQLdb.Error, e:
+		  print "Error %d: %s" % (e.args[0], e.args[1])
+		  sys.exit (1)
+
+		cursor = dbh.cursor()
+
+		# "dispatch" and parameterize query
+
+		self.paginate_html()
+
+		# search query
+		if form.has_key('num') and not (form["num"].value==""):
+		  query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" % (dbh.escape_string(form["type"].value), 
+																							dbh.escape_string(form["num"].value), 
+																							dbh.escape_string(self.order), 
+																							dbh.escape_string(self.offset), 
+																							dbh.escape_string(self.rowcount))
+		  cursor.execute(query)
+		else:
+		  # defaultquery
+		  query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(self.order), 
+																			  dbh.escape_string(self.offset), 
+																			  dbh.escape_string(self.rowcount))
+		  cursor.execute(query)
+
+		query_result = cursor.fetchall()
+		cursor.close()
+		cdr.results_html(query_result)
+		cdr.footer_html()
+
+	
+	def evaluate_params(self):
+		""" self.order, self.offset, self.rowcount, self.page """
+		# order
+		if form.has_key('o'):
+  			self.order=form["o"].value
+		else:
+		  self.order="desc"
+		# offset
+		if form.has_key('os'):
+		  self.offset=form["os"].value
+		else:
+		  self.offset="0"
+		# items per page
+		if form.has_key('rc'):
+		  self.rowcount=form["rc"].value
+		else:
+		  self.rowcount="50"
+		# page	  
+		if form.has_key('p'): 
+			self.page = form["p"].value
+		else: 
+			self.page = 0
+		# action
+		if form.has_key('a'): 
+			self.action = form["a"].value
+		else: 
+			self.action = "list"
+		
+			
+	def dispatch(self):
+		# self.action()
+		self.action_list()
+
+	def __init__(self):
+		self.evaluate_params()
 		
 
 
-# ********************** cgi.main **********************
-
-form=cgi.FieldStorage()
-
-# **************** set defaults for the query  ********************
-
-if form.has_key('o'):
-  order=form["o"].value
-else:
-  order="desc"
-
-if form.has_key('os'):
-  offset=form["os"].value
-else:
-  offset="0"
-
-# items per page
-if form.has_key('rc'):
-  rowcount=form["rc"].value
-else:
-  rowcount="50"
-
+		
 # **************** display  ********************
 
+form = cgi.FieldStorage()
+
 cdr = Cdr()
-
-cdr.header_html()
-cdr.searchform_html()
-
-# connect to MySQL Database
-try:
-  dbh = MySQLdb.Connect(host=config.get("mysql", "host"),
-                        user=config.get("mysql", "user"),
-                        passwd=config.get("mysql", "passwd"),
-                        db=config.get("mysql", "db"))
-
-except MySQLdb.Error, e:
-  print "Error %d: %s" % (e.args[0], e.args[1])
-  sys.exit (1)
-
-cursor = dbh.cursor()
-
-# "dispatch" and parameterize query
-if form.has_key('p'): page = form["p"].value
-else: page = 0
-
-cdr.paginate_html(page, offset, rowcount)
-
-# search query
-if form.has_key('num') and not (form["num"].value==""):
-  query = """select * from cdr where %s = %s order by calldate %s limit %s,%s""" % (dbh.escape_string(form["type"].value), 
-                                                                                    dbh.escape_string(form["num"].value), 
-                                                                                    dbh.escape_string(order), 
-                                                                                    dbh.escape_string(offset), 
-                                                                                    dbh.escape_string(rowcount))
-  cursor.execute(query)
-else:
-  # defaultquery
-  query = """select * from cdr order by calldate %s limit %s,%s""" % (dbh.escape_string(order), 
-                                                                      dbh.escape_string(offset), 
-                                                                      dbh.escape_string(rowcount))
-  cursor.execute(query)
-
-query_result = cursor.fetchall()
-cursor.close()
-
-cdr.results_html(query_result)
-cdr.footer_html()
+cdr.dispatch()
