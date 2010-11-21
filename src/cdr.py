@@ -253,24 +253,25 @@ class Cdr:
 			self.page = 0
 		# action
 		if form.has_key('a'): 
-			self.action = form["a"].value
+			self.action = "action_" + form["a"].value
 		else: 
-			self.action = "list"
-		
-			
+			self.action = "action_list"
+
 	def dispatch(self):
-		# self.action()
-		self.action_list()
+		if hasattr(self, self.action):
+			_action = getattr(self, self.action)()
+
+	def run(self):
+		self.dispatch()
 
 	def __init__(self):
 		self.evaluate_params()
-		
-
 
 		
-# **************** display  ********************
+# **********************************************************************
 
 form = cgi.FieldStorage()
 
 cdr = Cdr()
-cdr.dispatch()
+if __name__ == '__main__':
+    cdr.run()
