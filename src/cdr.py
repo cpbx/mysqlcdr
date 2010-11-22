@@ -102,8 +102,6 @@ def find_protocol(str):
 # **********************************************************************
 
 class Cdr:
-	html = ""
-	scriptname = ""
 	def header_html(self):
 		try:
 			style = open(get_default_confval('general', 'theme', 'theme_light.css'), 'r').read() 
@@ -152,15 +150,26 @@ class Cdr:
 			print "<input name=rc value=50 size=5>&nbsp;"
 		print "<input type=submit value=show></form></div>"
 
+	def paginate_billsum_html(self, vars):
+		print "<div id=paginate_billsum class=paginate>"
+		if int(vars['month']) > 1 and int(vars['month']) <= 12:
+			m = int(vars['month']) - 1
+			href = 'href="'+self.scriptname+'?a=billsum&amp;acc=%s&amp;m=%s&amp;y=%s"' % (self.account, m, vars['year'])
+			print "<a ", href, "> " + t('Previous') + " </a>"
+		# year == current_year and vars['month'] < current_month 
+		m = int(vars['month']) + 1
+		href = 'href="'+self.scriptname+'?a=billsum&amp;acc=%s&amp;m=%s&amp;y=%s"' % (self.account, m, vars['year'])
+		print "<a ",href,"> " + t('Next') + " </a>"
+		print "</div>"
 
 	def paginate_html(self):
 		page = self.page
 		offset = self.offset
 		rowcount = self.rowcount
 		order = self.order
-		print "<div id=paginate>"
-		if(int(page)>=1):
-			p = int(page)-1	  
+		print "<div id=paginate class=paginate>"
+		if int(page) >= 1:
+			p = int(page) - 1
 			ofs = int(p) * int(rowcount)
 			href = 'href="'+self.scriptname+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
 			print "<a ", href, "> " + t('Previous') + " </a>"
@@ -169,7 +178,6 @@ class Cdr:
 		href = 'href="'+self.scriptname+'?p=%s&amp;o=%s&amp;os=%d&amp;rc=%s"' % (p, order, ofs, rowcount)
 		print "<a ",href,"> " + t('Next') + " </a>"
 		print "</div>"
-		return
 
 	def list_html(self, query_result):
 		dt = datetime.now()
@@ -199,18 +207,31 @@ class Cdr:
 			  
 		print "</tbody></table></div>"
 
-	def billsum_html(self, seconds):
-		print "<div id=results><table>"
-		print "<thead><tr><td><b>" + cgi.escape(self.account)+"</b></td><td>"+t('seconds')+"</td><td>"+t('minutes')+"</td></thead><tbody>"
+	def billsum_html(self, vars):
+		
+		# vars = {"seconds": seconds, "minutes": minutes,"year": year, "month": month}
+		# print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1><a href=\"%(scriptname)s?a=list\">%(title)s</a></h1></div>\n" % vars
+		d = datetime(int(vars['year']), int(vars['month']), 1)
+		month = d.strftime("%B")
+		print "<div id=results>"
+		href = 'href="'+self.scriptname+'?a=billsum&amp;acc=%s&amp;m=%s&amp;y=%s"' % (self.account, vars['month'], vars['year'])
+		# print "<br>permalink: <a class=account ",href,">", vars['month'], " ", vars['year'], "</a><br>"
+		print "<h2><a class=account ",href,">%s %s</a></h2>" % (month, vars['year'])
+		print "<table><thead><tr><td><b>" + cgi.escape(self.account)+"</b></td><td>"+t('seconds')+"</td><td>"+t('minutes')+"</td></thead>"
 		# TODO incoming, sum of both. form: month(+/-), year
-		print "<tr>"
+		print "<tbody><tr>"
 		print "<td>"+ t('outgoing') +"</td>"
-		print "<td>",seconds,"</td>"
-		minutes = int(seconds) / 60;
-		print "<td>",str(minutes),"</td>"
+		print "<td>%d</td><td>%d</td>" % (vars['seconds'], vars['minutes'])
 		print "</tr>"
-		print "</tbody></table></div>"
+		print "</tbody></table>"
+		self.paginate_billsum_html(vars)
+		print "</div>"
 
+	def billsum_error_html(self):
+		print "<div id=results>"
+		href = 'href="'+self.scriptname+'"'
+		print "<h2><a class=account ",href,">"+t('No Results.')+"</a></h2>"
+		print "</div>"
 
 	def db_connect(self):
 		try:
@@ -261,31 +282,32 @@ class Cdr:
 		self.searchform_html()
 		dbh = self.db_connect()
 		cursor = dbh.cursor()
-
 		self.paginate_html()
-
-		# search query
+		dt = datetime.now()
+		year = str(dt.year)
+		month = str(dt.month)
 		
 		if form.has_key('m') and not (form["m"].value==""):
-			if form.has_key('y'):
-				year = form["y"].value
-			else:
-				dt = datetime.now()
-				year = str(dt.year)
-			query = """select sum(billsec) as bsum from cdr where month(calldate)=%s and year(calldate)=%s and accountcode=%s""" \
-							% (dbh.escape_string(form["m"].value),
-								dbh.escape_string(year),
-								dbh.escape_string(self.account))
-			cursor.execute(query)
-		else:
-			# defaultquery
-			query = """select sum(billsec) as bsum from cdr where accountcode=%s""" \
-							% (dbh.escape_string(self.account))
-			cursor.execute(query)
-
+			month = dbh.escape_string(form["m"].value)
+		
+		if form.has_key('y') and not (form["y"].value==""):
+			year = dbh.escape_string(form["y"].value)
+		
+		query = """select sum(billsec) as bsum from cdr where month(calldate)=%s and year(calldate)=%s and accountcode=%s""" \
+								% (dbh.escape_string(month),
+									dbh.escape_string(year),
+									dbh.escape_string(self.account))
+		cursor.execute(query)
 		query_result = cursor.fetchone()
 		cursor.close()
-		cdr.billsum_html(query_result[0])
+		
+		if query_result[0] is not None:
+			seconds = int(query_result[0])
+			minutes = int(seconds) / 60;
+			vars = {"seconds": seconds, "minutes": minutes,"year": year, "month": month}
+			cdr.billsum_html(vars)
+		else:
+			cdr.billsum_error_html()
 		cdr.footer_html()
 	
 	def evaluate_params(self):

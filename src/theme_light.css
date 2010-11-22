@@ -29,16 +29,17 @@ body {
     color:#00303d;
 }
 
-h1 {
+h1, h2 {
 	padding: 0.5em;
 }
 
-h1 a {
+
+h1 a, h2 a {
     color:#444;
     text-decoration:none;
 }
 
-h1 a:hover {
+h1 a:hover, h2 a:hover {
     color:#007;
 }
 
@@ -105,12 +106,12 @@ a.account:hover {
  * 
  * @section elements
  */
-#paginate {
+.paginate {
     background-color:#bcb;
     height:1.5em;
 }
 
-#paginate a {
+.paginate a {
     color:#fff;
     font-size: 90%;
     font-family: monospace;
@@ -126,9 +127,15 @@ a.account:hover {
     -khtml-border-radius:8px;
 }
 
-#paginate a:hover {
+.paginate a:hover {
     background-color:#363;
     border:2px solid #363;
+}
+
+#paginate_billsum {
+   padding-top:0.8em;
+   padding-left:0.2em;
+   background-color:#fff;
 }
 
 #searchform {
@@ -145,3 +152,4 @@ a.account:hover {
 	-webkit-border-top-right-radius:8px;
 	-khtml-border-top-right-radius:8px;
 }
+
