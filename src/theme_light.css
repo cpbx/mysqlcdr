@@ -153,3 +153,8 @@ a.account:hover {
 	-khtml-border-top-right-radius:8px;
 }
 
+#searchform input, select {
+	border:1px solid #fff;
+	background-color:#fff;
+	color:#1c4e63;
+}

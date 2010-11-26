@@ -208,14 +208,10 @@ class Cdr:
 		print "</tbody></table></div>"
 
 	def billsum_html(self, vars):
-		
-		# vars = {"seconds": seconds, "minutes": minutes,"year": year, "month": month}
-		# print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1><a href=\"%(scriptname)s?a=list\">%(title)s</a></h1></div>\n" % vars
 		d = datetime(int(vars['year']), int(vars['month']), 1)
 		month = d.strftime("%B")
 		print "<div id=results>"
 		href = 'href="'+self.scriptname+'?a=billsum&amp;acc=%s&amp;m=%s&amp;y=%s"' % (self.account, vars['month'], vars['year'])
-		# print "<br>permalink: <a class=account ",href,">", vars['month'], " ", vars['year'], "</a><br>"
 		print "<h2><a class=account ",href,">%s %s</a></h2>" % (month, vars['year'])
 		print "<table><thead><tr><td><b>" + cgi.escape(self.account)+"</b></td><td>"+t('seconds')+"</td><td>"+t('minutes')+"</td></thead>"
 		# TODO incoming, sum of both. form: month(+/-), year
