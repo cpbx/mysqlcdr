@@ -192,9 +192,9 @@ class Cdr:
 			if (lastapp == 'Busy'):
 				print "<img src=http://cpbx.eu/images/cdr/telephone_busy.png title=Busy>"
 			elif (lastapp == 'VoiceMail'):
-				print "<img src=http://cpbx.eu/images/cdr/voicemail.png title=VoiceMail>"
+				print "<img src=http://cpbx.eu/images/cdr/voicemail.png title=Voicemail>"
 			elif (lastapp == 'Dial' and disposition == 'ANSWERED'):
-				print "<img src=http://cpbx.eu/images/cdr/telephone.png title=busy>"
+				print "<img src=http://cpbx.eu/images/cdr/telephone.png title=Answered>"
 			else:
 				print "<img src=http://cpbx.eu/images/cdr/telephone_noanswer.png title=noanswer>"
 			print "</td><td>",calldate,"</td><td>", cgi.escape(clid),"</td><td>",cgi.escape(src),"</td><td>",cgi.escape(dst),"</td>"
