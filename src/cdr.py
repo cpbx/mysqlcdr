@@ -44,7 +44,7 @@ sys.stderr = sys.stdout
 
 # ********************** config **********************
 
-__revision__ = (1,1)
+__revision__ = (1,2)
 
 config = ConfigParser.ConfigParser()
 config.read('cdr_mysql.cfg')
@@ -194,7 +194,19 @@ class Cdr:
 			elif (lastapp == 'VoiceMail'):
 				print "<img src=http://cpbx.eu/images/cdr/voicemail.png title=Voicemail>"
 			elif (lastapp == 'Dial' and disposition == 'ANSWERED'):
-				print "<img src=http://cpbx.eu/images/cdr/telephone.png title=Answered>"
+				if not len(accountcode) == 0:
+					wavcalldate = str(calldate)
+					rectime = wavcalldate.split(' ')[1]
+					rectime = rectime.replace(':', '-')
+					recdate =  wavcalldate.split(' ')[0]
+					recdates = recdate.split('-')
+					recdate = recdates[2] + '-' + recdates[1] + '-' + recdates[0]
+					wavcalldate = recdate + '_' + rectime
+					wavfilename = 'out-%s-%s_%s.wav' % (accountcode, cgi.escape(dst), wavcalldate)
+					href = 'href="ftp_get.py?file=%s&amp;"' % (wavfilename)
+					print "<a class=account ",href,"><img src=http://cpbx.eu/images/cdr/music.png title=Answered></a>"
+				else:
+					print "<img src=http://cpbx.eu/images/cdr/telephone.png title=Answered>"
 			else:
 				print "<img src=http://cpbx.eu/images/cdr/telephone_noanswer.png title=noanswer>"
 			print "</td><td>",calldate,"</td><td>", cgi.escape(clid),"</td><td>",cgi.escape(src),"</td><td>",cgi.escape(dst),"</td>"
@@ -363,3 +375,4 @@ form = cgi.FieldStorage()
 cdr = Cdr()
 if __name__ == '__main__':
     cdr.run()
+

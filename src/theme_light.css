@@ -74,6 +74,10 @@ a.account:hover {
 	text-decoration:underline;
 }
 
+a.account img {
+  border:none;
+}
+
 .mISDN { color:#640;font-weight:bold;}
 .SIP { color:#049; font-weight:bold;}
 .IAX2 { color:#051; font-weight:bold;}
@@ -158,3 +162,4 @@ a.account:hover {
 	background-color:#fff;
 	color:#1c4e63;
 }
+
