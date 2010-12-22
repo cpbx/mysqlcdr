@@ -24,6 +24,12 @@ user=root
 passwd=myPassword
 db=cpbx
 
+; optional
+[ftp]
+passwd=ftp_pass
+user=ftp_user
+host=10.10.11.2
 </pre>
+
 
 Make sure Python 2.5+ and MySQLdb (python-mysqldb) is installed.
