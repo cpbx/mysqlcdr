@@ -46,6 +46,8 @@ sys.stderr = sys.stdout
 
 __revision__ = (1, 3)
 
+config = ConfigParser.ConfigParser()
+
 def get_default_confval(section, key, default):
     try:
         ret = config.get(section, key)
@@ -104,8 +106,8 @@ class Cdr:
         except (IOError), e:
             style = "/* default theme `theme_light.css' not found */"
         vars = {"style": style, "title": "CPBX Calldetails", "scriptname": self.scriptname}
-          print "Content-type: text/html"
-          print
+        print "Content-type: text/html"
+        print
         print "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
         print "<style>%(style)s</style><title>%(title)s</title></head><body><div id=body><div id=header><h1><a href=\"%(scriptname)s?a=list\">%(title)s</a></h1></div>\n" % vars
 
@@ -262,7 +264,7 @@ class Cdr:
         if form.has_key('num') and not (form["num"].value == ""):
             q = dbh.escape_string(form["num"].value)
             if (q.find('%') != -1):
-                query = """select * from cdr where %s like %s order by calldate %s limit %s,%s""" \
+                query = """select * from cdr where %s like '%s' order by calldate %s limit %s,%s""" \
                             % (dbh.escape_string(form["type"].value),
                                 q,
                                 dbh.escape_string(self.order),
@@ -377,7 +379,6 @@ class Cdr:
 
 if __name__ == '__main__':
     form = cgi.FieldStorage()
-    config = ConfigParser.ConfigParser()
     config.read('cdr_mysql.cfg')
     cdr = Cdr()
     cdr.run()
