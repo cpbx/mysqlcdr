@@ -7,6 +7,19 @@ License GNU GPL v3 (or any later)
 
 ************************************************************************
 
+h2. Usage and Features
+
+!http://cpbx.eu/wiki/_media/calldetails:cpbx_calldetails.jpg!
+
+h3. search field
+
+030123 - shows entries for 030123 
+030123%  - shows entries for 030123*, eg. 030123456
+%30123% - shows entries for *30123*, eg. 004930123456
+
+
+************************************************************************
+
 h2. INSTALLATION
 
 * move the src folder to the cgi-bin directory of your Webserver, 
