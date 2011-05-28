@@ -41,81 +41,81 @@ sys.stderr = sys.stdout
 
 
 def download(filename):
-	config = ConfigParser.ConfigParser()
-	config.read('cdr_mysql.cfg')
-	section = 'ftp'
-	ftp_host = config.get(section, 'host')
-	ftp_user = config.get(section, 'user')
-	ftp_pass = config.get(section, 'passwd')
+    config = ConfigParser.ConfigParser()
+    config.read('cdr_mysql.cfg')
+    section = 'ftp'
+    ftp_host = config.get(section, 'host')
+    ftp_user = config.get(section, 'user')
+    ftp_pass = config.get(section, 'passwd')
 
-	try:
-		ftp = ftplib.FTP(ftp_host)
-		ftp.login(ftp_user, ftp_pass)
-	except:
-		print "Unexpected error:", sys.exc_info()[0]
+    try:
+        ftp = ftplib.FTP(ftp_host)
+        ftp.login(ftp_user, ftp_pass)
+    except:
+        print "Unexpected error:", sys.exc_info()[0]
 
-	# ftp.retrlines('LIST')
-	tempfilename = '/tmp/mysqlcdr_.%s.tmp' % os.getpid()
-	# tempfilename = './temp/mysqlcdr_.%s.tmp' % os.getpid()
-	
-	try:
-	   	temp = open(tempfilename, 'w+b')
-	except:
-		error_html("Unexpected error:", sys.exc_info()[0])
+    # ftp.retrlines('LIST')
+    tempfilename = '/tmp/mysqlcdr_.%s.tmp' % os.getpid()
+    # tempfilename = './temp/mysqlcdr_.%s.tmp' % os.getpid()
+    
+    try:
+           temp = open(tempfilename, 'w+b')
+    except:
+        error_html("Unexpected error:", sys.exc_info()[0])
 
-	try:
-		ftp.retrbinary('RETR ' + filename, temp.write)
-	except (ftplib.error_perm,ftplib.error_temp),resp:
-		error_html("FTP Error", "File not Found.")
-	except:
-		error_html("Unexpected error:", sys.exc_info()[0])
-		
-	temp.close()
-	ftp.close()
+    try:
+        ftp.retrbinary('RETR ' + filename, temp.write)
+    except (ftplib.error_perm,ftplib.error_temp),resp:
+        error_html("FTP Error", "File not Found.")
+    except:
+        error_html("Unexpected error:", sys.exc_info()[0])
+        
+    temp.close()
+    ftp.close()
 
-	print 'Content-Type: audio/x-wav'
-	print
-	print file(tempfilename, "rb").read()
+    print 'Content-Type: audio/x-wav'
+    print
+    print file(tempfilename, "rb").read()
 
-	os.remove(tempfilename)
+    os.remove(tempfilename)
 
 
 
 def error_html(err_type, err_msg):
-	print "Content-type: text/html"
-	print
-	print """<html><head><title>error</title><style></style></head>
-	<body><h1>%s</h1><p>%s</p></body></html>""" % (err_type, err_msg)
-	sys.exit()
+    print "Content-type: text/html"
+    print
+    print """<html><head><title>error</title><style></style></head>
+    <body><h1>%s</h1><p>%s</p></body></html>""" % (err_type, err_msg)
+    sys.exit()
 
 
 def is_valid_file():
-	return True	
+    return True    
 
 
 def has_config():
-	config = ConfigParser.ConfigParser()
-	config.read('cdr_mysql.cfg')
-	section = 'ftp'
+    config = ConfigParser.ConfigParser()
+    config.read('cdr_mysql.cfg')
+    section = 'ftp'
 
-	if not config.has_section(section):
-		return False
-	return True
+    if not config.has_section(section):
+        return False
+    return True
 
-"""	
-	ftp_host = config.get(section, 'host')
-	ftp_user = config.get(section, 'user')
-	ftp_pass = config.get(section, 'passwd')
+"""    
+    ftp_host = config.get(section, 'host')
+    ftp_user = config.get(section, 'user')
+    ftp_pass = config.get(section, 'passwd')
 """
 
 if __name__ == "__main__":
-	params = cgi.FieldStorage()
-	try:
-		filename = params["file"].value
-	except:
-		error_html("Unexpected error", "required parameter missing.")
+    params = cgi.FieldStorage()
+    try:
+        filename = params["file"].value
+    except:
+        error_html("Unexpected error", "required parameter missing.")
 
-	if has_config() and is_valid_file():
-		download(filename)
-	else:
-		error_html("Unexpected error", "No input file given or config error")
+    if has_config() and is_valid_file():
+        download(filename)
+    else:
+        error_html("Unexpected error", "No input file given or config error")
